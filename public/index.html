@@ -68,7 +68,26 @@
         // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
         // // The Firebase SDK is initialized and available here!
         //
-        firebase.auth().onAuthStateChanged(user => { console.log(user) });
+        const firebaseConfig = {
+          apiKey: "AIzaSyBJsFr2HwilL6gTU5cGjy05HapRqJFEfmw",
+          authDomain: "menowebapp-a3641.firebaseapp.com",
+          databaseURL: "https://menowebapp-a3641.firebaseio.com",
+          projectId: "menowebapp-a3641",
+          storageBucket: "menowebapp-a3641.appspot.com",
+          messagingSenderId: "270656766987",
+          appId: "1:270656766987:web:ccf4c64a54b700308a730e",
+          measurementId: "G-JY8R9HMHZ8"
+        };
+        const auth = firebase.auth();
+        auth.onAuthStateChanged(user => {
+          if (user) {
+            // console.log(user);
+            document.getElementById('load').innerHTML = `Hello, ${user.email}`;
+          } else {
+            const authProvider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(authProvider);
+          }
+        });
         // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
         // firebase.messaging().requestPermission().then(() => { });
         // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
@@ -82,20 +101,6 @@
           document.getElementById('load').innerHTML = `Firebase SDK loaded with ${features.join(', ')}`;
           console.log(`Firebase SDK loaded with ${features.join(', ')}`);
 
-          const firebaseConfig = {
-            apiKey: "AIzaSyBJsFr2HwilL6gTU5cGjy05HapRqJFEfmw",
-            authDomain: "menowebapp-a3641.firebaseapp.com",
-            databaseURL: "https://menowebapp-a3641.firebaseio.com",
-            projectId: "menowebapp-a3641",
-            storageBucket: "menowebapp-a3641.appspot.com",
-            messagingSenderId: "270656766987",
-            appId: "1:270656766987:web:ccf4c64a54b700308a730e",
-            measurementId: "G-JY8R9HMHZ8"
-          };
-          // firebase.initializeApp(firebaseConfig);
-          let auth = firebase.auth();
-          const authProvider = new firebase.auth.GoogleAuthProvider();
-          auth.signInWithPopup(authProvider);
           
 
         // } catch (e) {
