@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import styled from "styled-components";
 import * as firebase from 'firebase';
-import { useEffect } from 'react';
+import { MarkedInput } from "../components/markedInput";
+import { Result } from "../components/result";
+import { ResultMarked } from "../components/result-marked";
+import EditorContext from "../editorContext";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBJsFr2HwilL6gTU5cGjy05HapRqJFEfmw",
@@ -15,10 +19,23 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 firebase.analytics();
 
+const EditorContainer = styled.div`
+  width: 100%;
+  /* height: 100%; */
+  height: 300px;
+  display: flex;
+`;
+
 export const MainPage = () => {
   const [user, setUser] = useState(null);
   const [displayName, setDisplayName] = useState(null);
   const [memo, setMemo] = useState('');
+  const [markdownText, setMarkdownText] = useState("");
+
+  const contextValue = {
+    markdownText,
+    setMarkdownText
+  };
   
   useEffect(() => {
     const database = firebase.database();
@@ -37,9 +54,14 @@ export const MainPage = () => {
           const dbMemo = (snapshot.val() && snapshot.val().memo) || '';
           setMemo(dbMemo);
         });
+        database.ref('users/' + user.uid).once('value').then(function(snapshot) {
+          const dbMarkdown = (snapshot.val() && snapshot.val().markdown) || '';
+          setMarkdownText(dbMarkdown);
+        });
       } else {
         setDisplayName('');
         setMemo('');
+        setMarkdownText('');
       }
     });
   }, []);
@@ -66,11 +88,12 @@ export const MainPage = () => {
     const database = firebase.database();
     database.ref('users/' + user.uid).update({
       memo: memo,
+      markdown: markdownText,
     });
   }
 
   return (
-    <div>
+    <EditorContext.Provider value={contextValue}>
       {user == null ? (
         <p>Please log in.</p>
       ) : (
@@ -92,6 +115,11 @@ export const MainPage = () => {
         </button>
         <div style={{ color: 'red' }}>{'<--- 여긴 DB 연동'}</div>
       </div>
-    </div>
+      <EditorContainer>
+        <MarkedInput />
+        <Result />
+        <ResultMarked />
+      </EditorContainer>
+    </EditorContext.Provider>
   )
 };
